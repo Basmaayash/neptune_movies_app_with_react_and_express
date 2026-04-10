@@ -25,7 +25,7 @@ export async function getAllMovies(req, res, next) {
     }
     // reduce the results return
     if (limit) {
-      if(Number(limit) === NaN) throw new HttpError(303,'limit must number');
+      if(isNaN(Number(limit))) throw new HttpError(303,'limit must number');
       dbMovies = dbMovies.slice(0,Number(limit));
     }
     // change the db object fields to API view keys
