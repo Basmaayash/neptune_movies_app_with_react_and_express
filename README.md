@@ -1,16 +1,13 @@
-# React + Vite
+# Movies App - Team Neptune
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the Movies App project! This repository contains the source code for both the frontend and backend of our application.
 
-Currently, two official plugins are available:
+## Team Members
+* Ahmed Habeeb – Backend Developer
+* Basma Ayash – Frontend Developer
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Project Structure
+The project is split into two main directories:
+* /backend -> Powered by Express.js (REST API)
+* /frontend -> Built with React.js (User Interface)
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
