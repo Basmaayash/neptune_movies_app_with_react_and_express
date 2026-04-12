@@ -1,93 +1,126 @@
-export class MovieMapper {
-  static #arrayFields = [
-    'genres',
-    'production_companies',
-    'production_countries',
-    'spoken_languages',
-    'keywords'
-  ];
 
-  // DTO key -> DB key
-  static #dtoToDbMap = {
-    rating: 'vote_average',
-    year: 'release_date',
-    description: 'overview',
-    title: 'title',
-    vote_count: 'vote_count',
-    status: 'status',
-    revenue: 'revenue',
-    runtime: 'runtime',
-    adult: 'adult',
-    budget: 'budget',
-    imdb_id: 'imdb_id',
-    original_language: 'original_language',
-    original_title: 'original_title',
-    popularity: 'popularity',
-    tagline: 'tagline',
-    genres: 'genres',
-    production_companies: 'production_companies',
-    production_countries: 'production_countries',
-    spoken_languages: 'spoken_languages',
-    keywords: 'keywords'
-  };
+// changes from db and dto 
+const arrayFields = [
+  'genres',
+  'production_companies',
+  'production_countries',
+  'spoken_languages',
+  'keywords'
+];
 
-  static #dbToDtoMap = Object.fromEntries(
-    Object.entries(MovieMapper.#dtoToDbMap).map(([dtoKey, dbKey]) => [dbKey, dtoKey])
-  );
+// map between dto and (entity and db)
+const dtoToDbMap = {
+  rating: 'vote_average',
+  year: 'release_date',
+  description: 'overview',
+  title: 'title',
+  vote_count: 'vote_count',
+  status: 'status',
+  revenue: 'revenue',
+  runtime: 'runtime',
+  adult: 'adult',
+  budget: 'budget',
+  imdb_id: 'imdb_id',
+  original_language: 'original_language',
+  original_title: 'original_title',
+  popularity: 'popularity',
+  tagline: 'tagline',
+  genres: 'genres',
+  production_companies: 'production_companies',
+  production_countries: 'production_countries',
+  spoken_languages: 'spoken_languages',
+  keywords: 'keywords'
+};
 
-  // Generic mapping: DB record -> entity or DTO
-  static mapDbToObject(dbMovie, toDto = false) {
-    const map = toDto ? this.#dbToDtoMap : null;
-    const obj = { id: dbMovie.id };
+const dbToDtoMap = Object.fromEntries(
+  Object.entries(dtoToDbMap).map(([dtoKey, dbKey]) => [dbKey, dtoKey])
+);
 
+
+export class DTOMapper {
+  static  fromDbToDTO (dbMovie) {
+    const map = dbToDtoMap;
+    const dto = {};
+    if(dbMovie.id) dto['id'] = dbMovie.id;
     for (const key in dbMovie) {
-      let targetKey = toDto ? map[key] : key;
-      if (!targetKey) continue;
-
+      const targetKey = map[key];
+      if (targetKey === undefined) continue;
       let value = dbMovie[key];
-
-      // Normalize arrays if mapping to DTO
-      if (toDto && this.#arrayFields.includes(targetKey)) {
-        value = this.#commaTextToArray(value);
-      }
-
-      obj[targetKey] = value;
+      //transform 
+      if (arrayFields.includes(key)) value = commaTextToArray(value);
+      dto[targetKey] = value;
     }
-
-    return obj;
+    return dto;
   }
 
-  // Generic mapping: DTO -> entity or DB
-  static mapDtoToObject(dto, toDb = false) {
-    const map = toDb ? this.#dtoToDbMap : null;
-    const obj = { };
-    
-    for (const key in dto) {
-      if (dto[key] === undefined) continue;
+  // in updating cases 
+  static fromDtoToDB (dto) {
+    const map = dtoToDbMap;
+    const db = {};
 
-      const targetKey = toDb ? map[key] || key : key;
+    for (const key in dto) {
+      const targetKey = map[key];
+      if (targetKey === undefined) continue;
+      let value = dto[key];
+      if (value === undefined) continue;
+      //transform 
+      if (arrayFields.includes(key) && typeof dto[key] === 'string')
+        value = commaTextToArray(value);
+      db[targetKey] = value;
+    }
+    return db;
+  } 
+
+  // used in creation & update
+  static fromDtoToEntity (dto) {
+    const map = dtoToDbMap;
+    const entity = {id:undefined};
+    for (const key in dto) {
+      const targetKey = map[key];
       let value = dto[key];
 
-      // Convert arrays to comma if mapping to DB
-      if (toDb && this.#arrayFields.includes(key)) {
-        value = this.#arrayToComma(value);
-      }
-
-      obj[targetKey] = value;
+      entity[targetKey] = value;
     }
-
-    return obj;
+    return entity;
   }
 
+}
 
-  // helpers for normalization 
-  static #commaTextToArray(text) {
-    if (!text || typeof text !== 'string') return [];
-    return text.split(',').map(v => v.trim()).filter(Boolean);
-  }
+export class EntityMapper {
+  static fromEntityToDB (entityMovie) {
+    const db = {};
+    for (const key in entityMovie) {
+      let value = entityMovie[key];
 
-  static #arrayToComma(arr) {
-    if (!Array.isArray(arr)) return '';
-    return arr.map(v => v.trim()).filter(Boolean).join(', ');
+      if (arrayFields.includes(key)) {
+        value = arrayToComma(value);
+      }
+      db[key] = value;
+    }
+    return db;
   }
+  
+  static fromDBToEntity (dbMovie) {
+    const entity = {};
+    for (const key in dbMovie) {
+      let value = dbMovie[key];
+
+      if (arrayFields.includes(key)) {
+        value = commaTextToArray(value);
+      }
+      entity[key] = value;
+    }
+    return entity;
+  }
+}
+
+//helpers for transformations 
+function commaTextToArray(text) {
+  if (!text || typeof text !== 'string') return [];
+  return text.split(',').map(v => v.trim()).filter(Boolean);
+}
+
+function arrayToComma(arr) {
+  if (!Array.isArray(arr)) return '';
+  return arr.map(v => v.trim()).filter(Boolean).join(', ');
 }

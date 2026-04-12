@@ -1,7 +1,7 @@
 export class Movie {
   
   constructor(data) {
-    this.id = data.id ?? this.#generateID();
+    this.id = data.id || 'N/A';
     this.title = data.title || '';
     this.vote_average = data.vote_average || 0;
     this.vote_count = data.vote_count || 0;
@@ -22,10 +22,6 @@ export class Movie {
     this.production_countries = data.production_countries || [];
     this.spoken_languages = data.spoken_languages || [];
     this.keywords = data.keywords || [];
-  }
-
-  #generateID() {
-
   }
 
   // ---- Business rules & functions ----
