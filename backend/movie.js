@@ -1,5 +1,7 @@
+import { movieRepository } from './repository.js'
+
 export class Movie {
-  
+
   constructor(data) {
     this.id = data.id || 'N/A';
     this.title = data.title || '';
@@ -22,6 +24,38 @@ export class Movie {
     this.production_countries = data.production_countries || [];
     this.spoken_languages = data.spoken_languages || [];
     this.keywords = data.keywords || [];
+  }
+
+  static async idGenerator (id = undefined) {
+    const err = new Error ();
+    err.code = 409;
+    if (id !==undefined && id !==null) {
+      const numeric_id = Number(id);
+      if (!Number.isInteger(numeric_id)) {
+        err.message = 'movie id must be integer value';
+        throw err;
+      }
+      // id not used before
+      const dbMov = await movieRepository.getById(Number(id));
+      if (dbMov) {
+        err.message = 'movie alreay exist';
+        throw err;
+      }
+      return Number(id);
+    }else {
+      //there no id generate new one not conflict with add external_ids and next ids
+      const MAX_ATTEMPS = 5;
+      let attemps = 0;
+     while (attemps < MAX_ATTEMPS) {
+      const next_id = await movieRepository.getNextId();
+      const dbMov = await movieRepository.getById(Number(next_id));
+      if (!dbMov) {
+        return Number(next_id);
+      }
+      attepms++;
+     }
+     throw new Error('Failed to generate unique ID');
+    }
   }
 
   // ---- Business rules & functions ----

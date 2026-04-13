@@ -65,7 +65,7 @@ export class MovieDTO {
     if (this.rating !== undefined && !this.#isNumber(this.rating)) {
       throw new Error('rating must be a number');
     }
-
+    //year validation (release_date)
     if (this.year !== undefined) {
       if (!(this.#isNumber(this.year) || this.#isString(this.year))) {
         throw new Error('year must be an integer or string');

@@ -58,14 +58,12 @@ export async function createMovie(req, res, next) {
   try {
     if (!req.body) throw new HttpError (400, 'Body data not included');
     let id = req.body.id;
-    if (id) {
-      const dbMov = await movieRepository.getById(Number(id));
-      if (dbMov) throw new HttpError (409,'movie alreay exist');
-    }
+    const valid_id = await Movie.idGenerator(id);
+    console.log(valid_id);
     const dto = MovieDTO.create(req.body); // validate & normalize
-    id = await movieRepository.getNextId();
     const entity = new Movie(DTOMapper.fromDtoToEntity(dto));
-    entity.id = id;
+    entity.id = valid_id;
+    console.log(entity)
     const dbData = EntityMapper.fromEntityToDB(entity);
     const created = await movieRepository.create(dbData);
     
