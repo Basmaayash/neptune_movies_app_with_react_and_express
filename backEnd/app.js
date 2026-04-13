@@ -1,8 +1,11 @@
-import express from 'express';
+ import express from 'express';
+ import cors from 'cors'; 
 import movieRouter from './router.js';
 
 const app = express();
-
+app.use(cors());
+app.use(express.json());
+app.use('/api/v1/movies', movieRouter);
 app.get('/test',(req,res)=>{
     res.send('server running on on port 5500');
 })
@@ -19,6 +22,7 @@ function erorrHandler (err, req, res, next) {
 
 //APP CONSTRUCTION  
 app.use (express.json()); //global middleware
+app.use('/assets', express.static('assets'));
 app.use ('/api/v1/movies',movieRouter); //routes
 app.use (erorrHandler); 
 
