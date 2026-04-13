@@ -1,5 +1,8 @@
  import express from 'express';
+<<<<<<< HEAD:backEnd/app.js
  import cors from 'cors'; 
+=======
+>>>>>>> 668e71a082668d994d1a2449cf59caf83647ed93:backend/app.js
 import movieRouter from './router.js';
 
 const app = express();

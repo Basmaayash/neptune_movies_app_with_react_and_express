@@ -1,5 +1,5 @@
 import { MovieDTO } from './movieDTO.js';
-import { MovieMapper } from './mapper.js';
+import { DTOMapper, EntityMapper } from './mapper.js';
 import { Movie } from './movie.js';
 import { movieRepository } from './repository.js';
 
@@ -25,12 +25,15 @@ export async function getAllMovies(req, res, next) {
     }
     // reduce the results return
     if (limit) {
-      if(isNaN(Number(limit))) throw new HttpError(303,'limit must number');
+      if(isNaN(Number(limit))) throw new HttpError(400,'limit must number');
       dbMovies = dbMovies.slice(0,Number(limit));
     }
     // change the db object fields to API view keys
-    const moviesDto = dbMovies.map(dbMovie => MovieMapper.mapDbToObject(dbMovie, true));
-    res.status(200).json({ success: true, movies: moviesDto });
+    let moviesDto = dbMovies.map(dbMovie => DTOMapper.fromDbToDTO(dbMovie));
+    if (moviesDto.length === 0) {
+      return res.status(404).json({success:true,message:"no movies found"});
+    }
+    return res.status(200).json({ success: true, movies: moviesDto });
   } catch (err) {
     next(err);
   }
@@ -42,9 +45,9 @@ export async function getMovieById(req, res, next) {
     const id = Number(req.params.id);
     if (!id) throw new HttpError(400, 'ID is required');
     const dbMovie = await movieRepository.getById(Number(id));
-    if (!dbMovie) throw new HttpError(404,'Movie not found');
-    const movieDto = MovieMapper.mapDbToObject(dbMovie, true);
-    res.status(200).json({ success: true, movie: movieDto });
+    if (!dbMovie) return res.status(404).json({success:true,message:'no movies found'});
+    const movieDto = DTOMapper.fromDbToDTO(dbMovie);
+    return res.status(200).json({ success: true, movie: movieDto });
   } catch (err) {
     next(err);
   }
@@ -54,19 +57,24 @@ export async function getMovieById(req, res, next) {
 export async function createMovie(req, res, next) {
   try {
     if (!req.body) throw new HttpError (400, 'Body data not included');
+    let id = req.body.id;
+    if (id) {
+      const dbMov = await movieRepository.getById(Number(id));
+      if (dbMov) throw new HttpError (409,'movie alreay exist');
+    }
     const dto = MovieDTO.create(req.body); // validate & normalize
-    const movieEntity = new Movie(MovieMapper.mapDtoToObject(dto));
-    movieEntity.id = await movieRepository.getNextId();
-    const dbData = MovieMapper.mapDtoToObject(dto, true); // map Entity -> DB
-    dbData.id = movieEntity.id;
+    id = await movieRepository.getNextId();
+    const entity = new Movie(DTOMapper.fromDtoToEntity(dto));
+    entity.id = id;
+    const dbData = EntityMapper.fromEntityToDB(entity);
     const created = await movieRepository.create(dbData);
-    res.status(201).json({
+    
+    return res.status(201).json({
       success: true,
       message: 'Movie created',
-      data: MovieMapper.mapDbToObject(created, true) // DB -> DTO
+      data: DTOMapper.fromDbToDTO(created)
     });
   } catch (err) {
-    err.code = 400;
     next(err);
   }
 }
@@ -78,16 +86,16 @@ export async function updateMovie(req, res, next) {
     if (!id) throw new HttpError (400, 'ID is required');
     if (!req.body) throw new HttpError (400, 'Body data not included');
     const dto = MovieDTO.create(req.body, true); // true => update mode
-    const patchData = MovieMapper.mapDtoToObject(dto, true); // map only provided fields DTO -> DB
+    const patchData = DTOMapper.fromDtoToDB(dto); 
     const updated = await movieRepository.update(Number(id), patchData);
     if (!updated) throw new HttpError (404, 'Movie not found');
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: `Movie ${id} updated`,
-      data: MovieMapper.mapDbToObject(updated, true)
+      data: DTOMapper.fromDbToDTO(updated)
     });
   } catch (err) {
+    if (!err.code) err.code = 400;
     next(err);
   }
 }
@@ -100,10 +108,10 @@ export async function deleteMovie(req, res, next) {
     const deleted = await movieRepository.delete(Number(id));
     if (!deleted) throw new HttpError (404, 'Movie not found');
     
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: `Movie ${id} deleted`,
-      data: MovieMapper.mapDbToObject(deleted, true)
+      data: DTOMapper.fromDbToDTO(deleted)
     })
   } catch (err) {
     next(err);
