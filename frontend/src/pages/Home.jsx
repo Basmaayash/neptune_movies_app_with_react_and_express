@@ -18,8 +18,6 @@ function Home() {
       const moviesList = data.movies || [];
 
       setMovies(moviesList);
-
-      // أول فيلم افتراضي
       setSelectedMovie(moviesList.length ? moviesList[0] : null);
     } catch (err) {
       console.error("خطأ في جلب الأفلام:", err);
@@ -28,17 +26,15 @@ function Home() {
 
   return (
     <div
-     
-  style={{
-    minHeight: "100vh",
-    transition: "0.5s",
-    backgroundImage: selectedMovie?.poster_data?.original
-      ? `url(${selectedMovie.poster_data.original})`
-      : "none",
-    backgroundSize: "cover",
-    backgroundPosition: "center"
-  }}
-
+      style={{
+        minHeight: "100vh",
+        transition: "0.5s ease",
+        backgroundImage: selectedMovie?.poster_data?.original
+          ? `url(${selectedMovie.poster_data.original})`
+          : "none",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
     >
       <Header onSearch={fetchMovies} />
 

@@ -1,36 +1,39 @@
 function Hero({ movie }) {
-
   const bg =
     movie?.poster_data?.original ||
-    "https://via.placeholder.com/800x1200";
+    "https://dummyimage.com/1920x1080/000/fff&text=No+Image";
 
   return (
     <>
+      {/* الخلفية */}
       <div
         className="background-overlay"
-        style={{ backgroundImage: `url(${bg})` }}
+        style={{
+          backgroundImage: `url(${bg})`,
+        }}
       />
 
+      {/* المحتوى */}
       <section className="hero">
-        <h1>{movie.title}</h1>
+        <h1>{movie?.title}</h1>
 
         <div className="movie-info">
-          <span className="rating">⭐ {movie.rating}</span>
+          <span className="rating">⭐ {movie?.rating}</span>
 
           <span className="dot">•</span>
 
           <span className="meta">
-            {movie.year?.split("/").pop()}
+            {movie?.year?.split("-")[0]}
           </span>
 
           <span className="dot">•</span>
 
           <span className="meta">
-            {movie.runtime} min
+            {movie?.runtime} min
           </span>
         </div>
 
-        <p>{movie.description}</p>
+        <p>{movie?.description}</p>
       </section>
     </>
   );
