@@ -1,7 +1,9 @@
 import { MovieDTO } from './movieDTO.js';
 import { DTOMapper, EntityMapper } from './mapper.js';
 import { Movie } from './movie.js';
-import { movieRepository } from './repository.js';
+import { movieRepository,externalDataRepository } from './repository.js';
+import { API_Service, getExternalApiDataForMovies,
+   updateExternlDataFromImdbAPI } from './imdbApiService.js'
 
 //custom http error
 class HttpError extends Error {
@@ -16,7 +18,7 @@ export async function getAllMovies(req, res, next) {
   try {
     const { search, limit } = req.query;
     let dbMovies = await movieRepository.getAll();
-    //filter data based on the search 
+    // filter data based on the search 
     if(search) {
       const searchLower = search.toLowerCase();
       dbMovies = dbMovies.filter (movie => {
@@ -29,7 +31,12 @@ export async function getAllMovies(req, res, next) {
       dbMovies = dbMovies.slice(0,Number(limit));
     }
     // change the db object fields to API view keys
-    let moviesDto = dbMovies.map(dbMovie => DTOMapper.fromDbToDTO(dbMovie));
+    let moviesDto = dbMovies.map (dbMovie => DTOMapper.fromDbToDTO(dbMovie))
+    const external_api_data = await getExternalApiDataForMovies();
+    moviesDto.forEach((movieDTO,index) => {
+      //grunteed the same order with movies db no need for liner search 
+      movieDTO['poster_data'] = external_api_data[index].poster_data || null;
+    })
     if (moviesDto.length === 0) {
       return res.status(404).json({success:true,message:"no movies found"});
     }
@@ -47,6 +54,8 @@ export async function getMovieById(req, res, next) {
     const dbMovie = await movieRepository.getById(Number(id));
     if (!dbMovie) return res.status(404).json({success:true,message:'no movies found'});
     const movieDto = DTOMapper.fromDbToDTO(dbMovie);
+    let external_data = await externalDataRepository.getDataByImdbID(movieDto.imdb_id);
+    movieDto['poster_data']= external_data.poster_data || null;
     return res.status(200).json({ success: true, movie: movieDto });
   } catch (err) {
     next(err);
@@ -59,14 +68,27 @@ export async function createMovie(req, res, next) {
     if (!req.body) throw new HttpError (400, 'Body data not included');
     let id = req.body.id;
     const valid_id = await Movie.idGenerator(id);
-    console.log(valid_id);
     const dto = MovieDTO.create(req.body); // validate & normalize
     const entity = new Movie(DTOMapper.fromDtoToEntity(dto));
     entity.id = valid_id;
-    console.log(entity)
     const dbData = EntityMapper.fromEntityToDB(entity);
     const created = await movieRepository.create(dbData);
-    
+    try {
+      //update external_Data 
+      if (created) {
+        let external = await API_Service.getMoviePosterImageDataByImdbID(created.imdb_id);
+
+        external = {
+          imdb_id: created.imdb_id,
+          poster_data: external
+        };
+
+        await externalDataRepository.upsertByImdbID(external);
+      }
+    }catch(err){
+      console.log("External API failed:", err.message);
+      // do NOT fail movie creation
+    }
     return res.status(201).json({
       success: true,
       message: 'Movie created',

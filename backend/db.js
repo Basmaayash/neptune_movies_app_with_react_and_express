@@ -11,6 +11,7 @@ function filePath(fileName) {
 
 const dbFile = 'movies-db.json';
 const metaFile = 'meta.json';
+const imdbExternalFile = 'imdbExternalData.json'
 
 // helpers
 async function readFile(fileName) {
@@ -39,7 +40,8 @@ async function writeFile(fileName, data) {
 
 const db = {
     movies: [],
-    meta: null,
+    meta: [],
+    externalData: [],
 
     async read() {
         this.movies = await readFile(dbFile);
@@ -57,6 +59,15 @@ const db = {
 
     async writeMeta() {
         await writeFile(metaFile, this.meta);
+    },
+    
+    async readExternalData() {
+        this.externalData= await readFile(imdbExternalFile);
+        return this.externalData;
+    },
+
+    async writeExternalData() {
+        await writeFile(imdbExternalFile,this.externalData);
     }
 };
 
