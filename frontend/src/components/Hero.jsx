@@ -1,22 +1,34 @@
 function Hero({ movie }) {
+  // دمجنا رابط الباك إند مع صورة الـ Hero
+  const bg = movie?.image 
+    ? `http://localhost:5500/assets/${movie.image}` 
+    : "https://placeholder.com";
+
   return (
-    <section className="hero">
-      <h1>{movie?.primaryTitle || movie?.title}</h1>
+    <>
+      <div
+        className="background-overlay"
+        style={{ backgroundImage: `url(${bg})` }}
+      />
 
-      <div className="movie-info">
-        <span>IMDB {movie?.rating?.aggregateRating || "N/A"}</span>
-        <span>•</span>
-        <span>{movie?.startYear || "N/A"}</span>
-        <span>•</span>
-        <span>
-          {movie?.runtimeSeconds
-            ? Math.floor(movie.runtimeSeconds / 60) + " min"
-            : "N/A"}
-        </span>
-      </div>
+      <section className="hero">
+        <h1>{movie.title}</h1>
 
-      <p>{movie?.plot || "No description"}</p>
-    </section>
+        <div className="movie-info">
+          <span className="rating">
+            <strong>IMDB</strong> {movie.rating || "N/A"}
+          </span>
+
+          <span>{movie.year}</span>
+
+          <span>{movie.duration || "120 min"}</span>
+
+          <span>{movie.genre || "N/A"}</span>
+        </div>
+
+        <p>{movie.description}</p>
+      </section>
+    </>
   );
 }
 
