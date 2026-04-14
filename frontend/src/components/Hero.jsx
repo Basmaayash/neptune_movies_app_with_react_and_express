@@ -14,17 +14,21 @@ function Hero({ movie }) {
       <section className="hero">
         <h1>{movie.title}</h1>
 
-        <div className="movie-info">
-          <span className="rating">
-            <strong>IMDB</strong> {movie.rating || "N/A"}
-          </span>
+     <div className="movie-info">
+  <span className="rating">⭐ {movie.vote_average}</span>
 
-          <span>{movie.year}</span>
+  <span className="dot">•</span>
 
-          <span>{movie.duration || "120 min"}</span>
+  <span className="meta">
+    {movie.release_date?.split("-")[0]}
+  </span>
 
-          <span>{movie.genre || "N/A"}</span>
-        </div>
+  <span className="dot">•</span>
+
+  <span className="meta">
+    {movie.runtime} min
+  </span>
+</div>
 
         <p>{movie.description}</p>
       </section>

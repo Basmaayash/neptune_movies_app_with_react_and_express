@@ -1,20 +1,17 @@
 function MovieCard({ movie, onSelect, isActive }) {
+  const posterUrl =
+    movie.poster_data?.original ||
+    "https://dummyimage.com/300x450/000/fff.jpg&text=No+Image";
+
   return (
     <div
       className="movie-item"
-      style={{
-        border: isActive ? "2px solid #F5C518" : "none",
-        padding: "10px"
-      }}
       onClick={() => onSelect(movie)}
+      style={{
+        border: isActive ? "2px solid #F5C518" : "none"
+      }}
     >
-      <img
-        src="https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg"
-        alt={movie.title}
-        style={{ width: "100%", borderRadius: "8px" }}
-      />
-
-      <h3>{movie.title}</h3>
+      <img src={posterUrl} alt={movie.title} />
     </div>
   );
 }

@@ -12,14 +12,14 @@ function Home() {
     fetchMovies();
   }, []);
 
-   const fetchMovies = async (query = "") => {
+  const fetchMovies = async (query = "") => {
     try {
       const data = await getMovies(query);
-      
-      // التعديل هون: لازم نوصل لـ data.movies لأن الباك إند ببعتها هيك
-      const moviesList = data.movies || []; 
-      
+      const moviesList = data.movies || [];
+
       setMovies(moviesList);
+
+      // أول فيلم افتراضي
       setSelectedMovie(moviesList.length ? moviesList[0] : null);
     } catch (err) {
       console.error("خطأ في جلب الأفلام:", err);
@@ -27,7 +27,19 @@ function Home() {
   };
 
   return (
-    <div className="container">
+    <div
+     
+  style={{
+    minHeight: "100vh",
+    transition: "0.5s",
+    backgroundImage: selectedMovie?.poster_data?.original
+      ? `url(${selectedMovie.poster_data.original})`
+      : "none",
+    backgroundSize: "cover",
+    backgroundPosition: "center"
+  }}
+
+    >
       <Header onSearch={fetchMovies} />
 
       {selectedMovie && <Hero movie={selectedMovie} />}
