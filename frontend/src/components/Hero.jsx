@@ -19,18 +19,18 @@ function Hero({ movie }) {
 
         <div className="movie-info">
           <span className="rating">⭐ {movie?.rating}</span>
+<span className="dot">•</span>
+<span className="meta">
+  {typeof movie?.year === "string"
+    ? movie.year.split("-")[0]
+    : movie?.year}
+</span>
 
-          <span className="dot">•</span>
+<span className="dot">•</span>
+<span className="meta">{movie?.runtime} min</span>
 
-          <span className="meta">
-            {movie?.year?.split("-")[0]}
-          </span>
-
-          <span className="dot">•</span>
-
-          <span className="meta">
-            {movie?.runtime} min
-          </span>
+<span className="dot">•</span>
+<span className="meta">{movie?.genre}</span>
         </div>
 
         <p>{movie?.description}</p>

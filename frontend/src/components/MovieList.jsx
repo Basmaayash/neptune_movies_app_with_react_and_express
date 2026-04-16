@@ -1,8 +1,10 @@
 import MovieCard from "./MovieCard.jsx";
 import { useRef } from "react";
 
-function MovieList({ movies, onSelect, selectedMovie }) {
+function MovieList({ movies, onSelect, selectedMovie, onHover, onDelete }) {
   const listRef = useRef();
+
+  console.log("movies:", movies); // ✔ هنا صح
 
   const scroll = (dir) => {
     listRef.current.scrollBy({
@@ -23,15 +25,17 @@ function MovieList({ movies, onSelect, selectedMovie }) {
       </div>
 
       <div className="movies-list" ref={listRef}>
-            {movies.map((movie) => (
-      <MovieCard
-        key={movie.id} 
-        movie={movie}
-        onSelect={onSelect}
-        isActive={selectedMovie === movie}
-      />
-    ))}
-          </div>
+        {movies.map((movie) => (
+          <MovieCard
+            key={movie.id}
+            movie={movie}
+            onSelect={onSelect}
+            onHover={onHover}
+            onDelete={onDelete}
+            isActive={selectedMovie?.id === movie.id}
+          />
+        ))}
+      </div>
     </div>
   );
 }

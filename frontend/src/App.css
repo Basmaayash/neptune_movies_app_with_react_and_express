@@ -9,7 +9,7 @@ body {
     background-color: #000;
     color: white;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* ================= BACKGROUND ================= */
@@ -42,12 +42,11 @@ header {
     padding: 40px 60px;
 }
 
-/* LOGO */
 .logo {
     display: flex;
     align-items: center;
     gap: 8px;
-    text-decoration: none; /* 🔥 حل خط NEW MOVIE */
+    text-decoration: none;
 }
 
 .new-box {
@@ -64,7 +63,7 @@ header {
     font-weight: 600;
 }
 
-/* SEARCH */
+/* ================= SEARCH ================= */
 .search {
     display: flex;
     align-items: center;
@@ -99,7 +98,7 @@ header {
     margin-top: 10px;
 }
 
-/* ================= MOVIE INFO (IMDB FIX) ================= */
+/* ================= MOVIE INFO ================= */
 .movie-info {
     display: flex;
     align-items: center;
@@ -108,7 +107,6 @@ header {
     font-size: 14px;
 }
 
-/* ⭐ IMDB */
 .rating {
     background: #F5C518;
     color: #000;
@@ -120,19 +118,17 @@ header {
     align-items: center;
 }
 
-/* dots */
 .dot {
     opacity: 0.6;
     font-size: 18px;
 }
 
-/* meta info */
 .meta {
     opacity: 0.8;
     white-space: nowrap;
 }
 
-/* ================= MOVIES ================= */
+/* ================= CAROUSEL ================= */
 .carousel-container {
     position: absolute;
     bottom: 15px;
@@ -140,7 +136,6 @@ header {
     padding: 0 60px;
 }
 
-/* arrows */
 .nav-buttons-wrapper {
     display: flex;
     gap: 8px;
@@ -166,7 +161,7 @@ header {
     border-color: white;
 }
 
-/* list */
+/* ================= MOVIE LIST ================= */
 .movies-list {
     display: flex;
     gap: 14px;
@@ -179,8 +174,9 @@ header {
     display: none;
 }
 
-/* ================= MOVIE CARD (FIX SIZE) ================= */
+/* ================= MOVIE CARD ================= */
 .movie-item {
+    position: relative;
     min-width: 130px;
     height: 190px;
     border-radius: 10px;
@@ -196,11 +192,55 @@ header {
     object-fit: cover;
 }
 
+/* hover zoom */
 .movie-item:hover {
     transform: scale(1.08);
+    z-index: 5;
 }
 
-/* 🔥 منع النص اللي تحت الصورة */
+/* ================= DELETE BUTTON ================= */
+.delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    width: 26px;
+    height: 26px;
+
+    border-radius: 50%;
+    border: none;
+
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    opacity: 0;
+    transform: scale(0.8);
+
+    transition: 0.2s ease;
+}
+
+/* يظهر عند hover على الفيلم */
+.movie-item:hover .delete-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* hover على الزر */
+.delete-btn:hover {
+    background: #ff3b3b;
+    transform: scale(1.1);
+}
+
+/* hide old text */
 .movie-item h3 {
     display: none;
 }
