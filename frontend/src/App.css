@@ -85,7 +85,11 @@ header {
 .hero {
     padding: 0 60px;
     max-width: 600px;
+    height: 260px;
+    overflow: hidden;
+    margin-bottom: 40px;
 }
+
 
 .hero h1 {
     font-size: 60px;
@@ -93,9 +97,13 @@ header {
 }
 
 .hero p {
-    font-size: 14px;
-    opacity: 0.8;
-    margin-top: 10px;
+  font-size: 14px;
+  opacity: 0.8;
+  margin-top: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;   /* عدد الأسطر */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* ================= MOVIE INFO ================= */
@@ -130,10 +138,10 @@ header {
 
 /* ================= CAROUSEL ================= */
 .carousel-container {
-    position: absolute;
-    bottom: 15px;
-    width: 100%;
-    padding: 0 60px;
+  position: relative;
+  margin-top: 40px;
+  width: 100%;
+  padding: 0 60px;
 }
 
 .nav-buttons-wrapper {
@@ -243,4 +251,104 @@ header {
 /* hide old text */
 .movie-item h3 {
     display: none;
+}
+/* ================= ADD MOVIE FORM ================= */
+.add-btn {
+  margin: 10px 60px;
+  padding: 10px 16px;
+  background: #F5C518;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 100;
+}
+.modal-content {
+  background: #111;
+  padding: 20px;
+  border-radius: 12px;
+  width: 320px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.modal-content input {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+.close-btn {
+  background: gray;
+}
+.hero {
+  margin-bottom: 40px;
+}
+.nav-buttons-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.left-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.add-btn-small {
+  padding: 6px 14px;
+  font-size: 13px;
+  background: #F5C518;
+  border: none;
+  border-radius: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.movie-item:hover .delete-btn,
+.movie-item:hover .edit-btn {
+    opacity: 1;
+}
+
+.add-btn-small:hover {
+  background: #ffd54f;
+  transform: scale(1.05);
+}
+.edit-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 40px;
+
+    width: 26px;
+    height: 26px;
+
+    border-radius: 6px;
+    border: none;
+
+    background: rgba(0,0,0,0.6);
+    color: white;
+
+    cursor: pointer;
+
+    opacity: 0;
+    transition: 0.2s;
+}
+
+/* يظهر مع hover */
+.movie-item:hover .edit-btn {
+    opacity: 1;
 }

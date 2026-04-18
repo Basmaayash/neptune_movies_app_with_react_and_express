@@ -1,7 +1,17 @@
-function MovieCard({ movie, onSelect, onHover, onDelete, isActive }) {
-  const posterUrl =
-    movie.poster_data?.original ||
+function MovieCard({
+  movie,
+  onSelect,
+  onHover,
+  onDelete,
+  onEdit,
+  isActive,
+}) {
+  if (!movie) return null;
+
+  const poster =
+    movie.poster ||
     movie.poster_data?.posters?.sx300?.url ||
+    movie.poster_data?.original ||
     "https://dummyimage.com/300x450/000/fff&text=No+Image";
 
   return (
@@ -10,34 +20,28 @@ function MovieCard({ movie, onSelect, onHover, onDelete, isActive }) {
       onClick={() => onSelect(movie)}
       onMouseEnter={() => onHover(movie)}
       onMouseLeave={() => onHover(null)}
-      style={{
-        border: isActive ? "2px solid #F5C518" : "none",
-      }}
+      style={{ border: isActive ? "2px solid #F5C518" : "none" }}
     >
-      <img src={posterUrl} alt={movie.title} />
+      <img src={poster} alt={movie.title} />
 
-      {/* 🔥 زر الحذف */}
-      
-      <button className="delete-btn"
-        style={{
-          position: "absolute",
-          top: "5px",
-          right: "5px",
-          zIndex: 9999,
-          background: "red",
-          color: "white",
-          border: "none",
-          padding: "5px",
-          fontSize: "12px",
-          cursor: "pointer"
-        }}
+      <button
+        className="delete-btn"
         onClick={(e) => {
           e.stopPropagation();
-          console.log("DELETE CLICKED:", movie.id);
           onDelete(movie.id);
         }}
       >
         X
+      </button>
+
+      <button
+        className="edit-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          onEdit(movie);
+        }}
+      >
+        ✏
       </button>
     </div>
   );

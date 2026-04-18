@@ -2,94 +2,134 @@ import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Hero from "../components/Hero";
 import MovieList from "../components/MovieList";
-import { getMovies } from "../services/api";
+import MovieModal from "../components/MovieModal";
+
+import {
+  getMovies,
+  addMovie,
+  deleteMovie,
+  updateMovie,
+} from "../services/api";
 
 function Home() {
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [hoveredMovie, setHoveredMovie] = useState(null);
-const [loadingDelete, setLoadingDelete] = useState(false);
-  // 🔥 states مطلوبة
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-const deleteMovie = async (id) => {
-  try {
-    setLoadingDelete(true);
 
-    await fetch(`http://localhost:5500/api/v1/movies/${id}`, {
-      method: "DELETE",
-    });
+  const [showModal, setShowModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-    setMovies((prev) => prev.filter((movie) => movie.id !== id));
+  const [formData, setFormData] = useState({
+    id: null,
+    title: "",
+    description: "",
+    year: "",
+    poster: "",
+  });
 
-    setSelectedMovie((prev) =>
-      prev?.id === id ? null : prev
-    );
+  const fetchMovies = async (query = "") => {
+    try {
+      const data = await getMovies(query);
+      setMovies(data);
 
-  } catch (err) {
-    console.log("Delete error:", err);
-  } finally {
-    setLoadingDelete(false);
-  }
-};
-
+      if (!query) {
+        setSelectedMovie(data?.[0] || null);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     fetchMovies();
   }, []);
 
-  const fetchMovies = async (query = "") => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
-      setLoading(true);
-      setError(null);
+      if (isEditing && formData.id) {
+        await updateMovie(formData.id, {
+          title: formData.title,
+          description: formData.description,
+          year: Number(formData.year),
+          poster: formData.poster,
+        });
+      } else {
+        await addMovie({
+          title: formData.title,
+          description: formData.description,
+          year: Number(formData.year),
+          poster: formData.poster,
+        });
+      }
 
-      const data = await getMovies(query);
-      const moviesList = data.movies || [];
+      setShowModal(false);
+      setIsEditing(false);
+      setFormData({
+        id: null,
+        title: "",
+        description: "",
+        year: "",
+        poster: "",
+      });
 
-      setMovies(moviesList);
-      setSelectedMovie(moviesList.length ? moviesList[0] : null);
+      fetchMovies();
     } catch (err) {
-      setError("Failed to fetch movies");
-    } finally {
-      setLoading(false);
+      console.log(err);
     }
   };
 
-  // 🔥 hover له أولوية
-  const currentMovie = hoveredMovie || selectedMovie;
+  const handleDelete = async (id) => {
+    try {
+      await deleteMovie(id);
+
+      setMovies((prev) => prev.filter((m) => m.id !== id));
+
+      if (selectedMovie?.id === id) {
+        setSelectedMovie(null);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleEdit = (movie) => {
+    setFormData(movie);
+    setIsEditing(true);
+    setShowModal(true);
+  };
+
+  const currentMovie =
+    hoveredMovie !== null ? hoveredMovie : selectedMovie;
 
   return (
-    <div style={{ minHeight: "100vh" }}>
-      
+    <div>
       <Header onSearch={fetchMovies} />
 
-      {/* 🔥 حالات */}
-      {loading && <p style={{ padding: "20px" }}>Loading...</p>}
-      
-      {error && (
-        <p style={{ padding: "20px", color: "red" }}>
-          {error}
-        </p>
-      )}
-
-      {!loading && !error && movies.length === 0 && (
-        <p style={{ padding: "20px" }}>
-          No movies found
-        </p>
-      )}
-
-      {/* 🔥 Hero */}
       {currentMovie && <Hero movie={currentMovie} />}
 
-      {/* 🔥 Movie List */}
       <MovieList
-  movies={movies}
-  selectedMovie={selectedMovie}
-  onSelect={setSelectedMovie}
-  onHover={setHoveredMovie}
-  onDelete={deleteMovie}
-/>
+        movies={movies}
+        selectedMovie={selectedMovie}
+        onSelect={setSelectedMovie}
+        onHover={setHoveredMovie}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+        onAddClick={() => {
+          setIsEditing(false);
+          setShowModal(true);
+        }}
+      />
 
+      <MovieModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onSubmit={handleSubmit}
+        formData={formData}
+        setFormData={setFormData}
+        isEditing={isEditing}
+      />
     </div>
   );
 }

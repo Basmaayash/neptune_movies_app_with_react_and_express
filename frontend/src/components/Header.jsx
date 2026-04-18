@@ -5,18 +5,20 @@ function Header({ onSearch }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch(input.trim());
+
+    const query = input.trim();
+    onSearch(query);
+    setInput("");
   };
 
   return (
     <header>
-      <a href="#" className="logo">
+      <div className="logo">
         <span className="new-box">NEW</span>
         <span className="movie-text">MOVIE</span>
-      </a>
+      </div>
 
       <form className="search" onSubmit={handleSubmit}>
-        <i className="fa fa-search"></i>
         <input
           type="text"
           placeholder="Search..."
